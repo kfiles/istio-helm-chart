@@ -1,0 +1,6 @@
+global:
+  rbacEnabled: false
+
+sidecar-injector:
+  enabled: true
+  includeIPRanges: "10.43.0.0/16"

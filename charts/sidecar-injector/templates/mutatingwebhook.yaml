@@ -1,0 +1,29 @@
+{{- if .Capabilities.APIVersions.Has "admissionregistration.k8s.io/v1beta1" -}}
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: {{ template "sidecar-injector.fullname" . }}
+  labels:
+    app: {{ template "sidecar-injector.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    istio: sidecar-injector
+webhooks:
+  - name: sidecar-injector.istio.io
+    clientConfig:
+      service:
+        name: {{ .Release.Name }}-sidecar-injector
+        namespace: {{ .Release.Namespace }}
+        path: "/inject"
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN4ekNDQWErZ0F3SUJBZ0lJQWZyV2hEKzJhVHN3RFFZSktvWklodmNOQVFFTkJRQXdFVEVQTUEwR0ExVUUKQ2d3R1kyRjBkR3hsTUI0WERURTRNREl4TWpFeE16WXlNRm9YRFRJNE1ESXhNREV4TXpZeU1Gb3dFVEVQTUEwRwpBMVVFQ2d3R1kyRjBkR3hsTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF5eTN4CmpVSlJObVRGbHlCSm44TUtGMGdnb3U2bVdHQWw3eEY5S2ZUanFibUI1bjZDMXR2N0JQYXExbUZoQjJjVGx1WVoKWVpuYjhWZkNsYnFKWTJnNUFkN3REVnhxbEFBa3V0eUxnNjFaekYwWUFMTmV0MTZZQms1cURWT1RvNzhIb3lmawpzUEowL1VxdERiOHhlWDVoMmZtY3ZYMlZpeTVqVE10MVVRcUpucDRJaDhucXRGaHNmUEkrbm9aUnBtNzRPTWJtClVIczVMNGQ4SUxjYldhYkRpSUJ4NVkxa3ppVjdRa3VSTEIwZS9rSjBsTDUrNjBKOFBIRWQxVDIzazVDVFlGS2EKZFd5MUNMR3RyK204eVNvaFhDb1RPUGk4M1Y0RnRMaU1DL1N5Zkh4TkYxZUZQWTk1L0hjT2FndTcxR1hBSXRmRApqVEJxb2xXcTVKdGlaWlJZZ1FJREFRQUJveU13SVRBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUE0R0ExVWREd0VCCi93UUVBd0lDcERBTkJna3Foa2lHOXcwQkFRMEZBQU9DQVFFQUNPdDgvZVk4THpuc2xiSitJV21yS01jbDEzY2MKcEgxOUtLSHA2NGUyOUlQUENDZ0djeVZhT2NuR2ZUZlZQTmMvS0pHMm5naXp2aHBKdnV1azRLZDZrOVZGalRQSQo0NDBOZmRLNUI2Q1pUZEFldTFDWk9YbzR3dHpzVnQydW9aR0c3MGdIR1hFdjRQcHlwaWduME1mcmhRR0JLZ1U2ClRnKzdSb2ZDOThhTnUyeWhXVWdia3dPdHF2THJQaTVtVDVjY0VTbHE4Rno0SDFNS0o1bTA0bjhhT2g3SVdURnMKVll5UzNSOXVabWFIT2l2RlFkbWdTejJROVdFa05TN1RRbzNFU3VLN21TOXVQeWFSRWhBUC9FMi9Dbm4rNTFWZQpiMTJURWhHSUFhampSM3BKaGtmKzZyQkE5ZDB6Y3UvV3BLa1ZTb2cvMmxwS3JnVENncFRaa25VUGFBPT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+    rules:
+      - operations: [ "CREATE" ]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+    failurePolicy: Fail
+    namespaceSelector:
+      matchLabels:
+        istio-injection: enabled
+{{- end -}}
